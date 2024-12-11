@@ -1,17 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 import { Injectable } from '@nestjs/common';
-import { Client, LocalAuth } from 'whatsapp-web.js';
+import { Client } from 'whatsapp-web.js';
 import qrcode from 'qrcode-terminal';
-
-// let sessions = {};
-
-// try {
-//   const sessionsPath = path.resolve(__dirname, '../../../../sessions.json');
-//   sessions = JSON.parse(fs.readFileSync(sessionsPath, 'utf8'));
-// } catch {
-//   console.log('No sessions found, starting fresh.');
-// }
 
 @Injectable()
 export class UserService {
@@ -19,7 +10,7 @@ export class UserService {
 
   constructor() {}
 
-  initilizeClient = (userId: string) => {
+  initializeClient = (userId: string) => {
     userId = '989028427004@c.us';
 
     if (this.clients[userId]) {
@@ -31,15 +22,13 @@ export class UserService {
       puppeteer: {
         headless: true,
       },
-      authStrategy: new LocalAuth({
-        clientId: 'YOUR_CLIENT_ID',
-      }),
+      // authStrategy: new LocalAuth({
+      //   clientId: 'YOUR_CLIENT_ID',
+      // }),
       // session: sessions[userId] || undefined,
     });
 
     this.clients[userId] = client;
-
-    client.initialize();
 
     client.on('qr', (qr) => {
       console.log(`QR code for user ${userId}: ${qr}`);
@@ -50,11 +39,10 @@ export class UserService {
     client.on('authenticated', (session) => {
       console.log(session, client);
       console.log(`User ${userId} authenticated!`);
-      sessions[userId] = session;
       try {
         fs.writeFileSync(
           path.resolve(__dirname, '../../../../sessions.json'),
-          JSON.stringify(sessions, null, 2),
+          JSON.stringify(session, null, 2),
         );
       } catch {
         console.log('I have error on write a session on sessions.json');
@@ -65,5 +53,7 @@ export class UserService {
       console.log(`User ${userId} disconnected: ${reason}`);
       delete this.clients[userId];
     });
+
+    client.initialize();
   };
 }

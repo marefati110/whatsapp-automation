@@ -1,0 +1,3 @@
+interface IAccount {
+  owner: string;
+}

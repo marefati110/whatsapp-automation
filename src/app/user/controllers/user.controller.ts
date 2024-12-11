@@ -8,6 +8,6 @@ export class UserController {
 
   @Post()
   registerUser(@Body() body: { userId: string }) {
-    return this.userService.initilizeClient(body.userId);
+    return this.userService.initializeClient(body.userId);
   }
 }
